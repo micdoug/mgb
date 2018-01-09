@@ -104,3 +104,44 @@ class MobileNeighborhoodTests(TestCase):
         mn2.remove(1)
         intersec = mn1 | mn2
         self.assertSetEqual(intersec, {3, 4, 5})
+
+    def test_is_inactive(self) -> None:
+        """Test is_inactive property."""
+        Entity.INACTIVE_THRESHOLD = 2
+        mn = MobileNeighborhood()
+        self.assertFalse(mn.is_inactive)
+        mn.add(1)
+        mn.add(2)
+        mn.add(3)
+        self.assertFalse(mn.is_inactive)
+        mn[1].increment_away()
+        mn[1].increment_away()
+        self.assertFalse(mn.is_inactive)
+        mn[2].increment_away()
+        mn[2].increment_away()
+        self.assertTrue(mn.is_inactive)
+        mn[2].increment_close()
+        self.assertFalse(mn.is_inactive)
+        mn[2].increment_away()
+        mn[2].increment_away()
+        self.assertTrue(mn.is_inactive)
+        mn.add(4)
+        self.assertFalse(mn.is_inactive)
+
+    def test_group_correlation(self) -> None:
+        """Test group_correlation method."""
+        mn1 = MobileNeighborhood()
+        mn2 = MobileNeighborhood()
+
+        self.assertEqual(mn1.group_correlation(mn2), 0)
+        mn1.add(1)
+        self.assertEqual(mn1.group_correlation(mn2), 0)
+        mn2.add(1)
+        self.assertEqual(mn1.group_correlation(mn2), 1)
+        mn2.add(2)
+        self.assertEqual(mn1.group_correlation(mn2), 0.5)
+        mn2.add(3)
+        mn2.add(4)
+        mn2.add(5)
+        mn1.add(2)
+        self.assertEqual(mn1.group_correlation(mn2), 0.4)
