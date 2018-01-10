@@ -13,6 +13,8 @@ from entity import Entity
 # Define the types supported for checking with 'in' instruction
 MEMBER = TypeVar('MEMBER', int, Entity)
 
+OPERATOR = TypeVar('OPERATOR', Set[int], 'MobileNeighborhood')
+
 
 class MobileNeighborhood(object):
     """Define a neighborhood set.
@@ -30,16 +32,16 @@ class MobileNeighborhood(object):
         return self._entities
 
     @property
-    def is_inactive(self):
-        """Check if the mobile neighborhood is inactive.
+    def is_active(self):
+        """Check if the mobile neighborhood is active.
 
-        A group is considered inactive when more than 50% of the members is inactive.
+        A group is considered active when at least 50% of the members are active.
         """
         if self:
             not_active = len([m for m in self.entities.values() if not m.is_active])
-            return (not_active / len(self)) > 0.5
+            return (not_active / len(self)) < 0.5
         else:
-            return False
+            return True
 
     def add(self, uid: int) -> None:
         """Add a new entity in the neighborhood list.
@@ -81,19 +83,37 @@ class MobileNeighborhood(object):
     def __repr__(self) -> str:
         return "MobileNeighborhood(entities: {!r})".format(self.entities)
 
-    def __and__(self, other: 'MobileNeighborhood') -> AbstractSet[int]:
+    def __and__(self, other: OPERATOR) -> AbstractSet[int]:
         """Return the ids of intersection between two groups.
 
-        :param other: Other group to be compared with.
+        :param other: Other group to be compared with or a set of ids.
         """
-        return self.entities.keys() & other.entities.keys()
+        if isinstance(other, set):
+            return self._entities.keys() & other
+        else:
+            return self.entities.keys() & other.entities.keys()
 
-    def __or__(self, other: 'MobileNeighborhood') -> AbstractSet[int]:
+    def __or__(self, other: OPERATOR) -> AbstractSet[int]:
         """Return the ids of union members between two groups.
 
         :param other: Other group to be compared with.
         """
-        return self.entities.keys() | other.entities.keys()
+        if isinstance(other, set):
+            return self._entities.keys() | other
+        else:
+            return self.entities.keys() | other.entities.keys()
+
+    def __sub__(self, other: OPERATOR) -> AbstractSet[int]:
+        if isinstance(other, set):
+            return self._entities.keys() - other
+        else:
+            return self._entities.keys - other._entities.keys()
+
+    def __rsub__(self, other: OPERATOR) -> AbstractSet[int]:
+        if isinstance(other, set):
+            return other - self._entities.keys()
+        else:
+            return other._entities.keys() - self._entities.keys
 
     def __len__(self) -> int:
         return len(self._entities)

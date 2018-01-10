@@ -109,24 +109,24 @@ class MobileNeighborhoodTests(TestCase):
         """Test is_inactive property."""
         Entity.INACTIVE_THRESHOLD = 2
         mn = MobileNeighborhood()
-        self.assertFalse(mn.is_inactive)
+        self.assertTrue(mn.is_active)
         mn.add(1)
         mn.add(2)
         mn.add(3)
-        self.assertFalse(mn.is_inactive)
+        self.assertTrue(mn.is_active)
         mn[1].increment_away()
         mn[1].increment_away()
-        self.assertFalse(mn.is_inactive)
+        self.assertTrue(mn.is_active)
         mn[2].increment_away()
         mn[2].increment_away()
-        self.assertTrue(mn.is_inactive)
+        self.assertFalse(mn.is_active)
         mn[2].increment_close()
-        self.assertFalse(mn.is_inactive)
+        self.assertTrue(mn.is_active)
         mn[2].increment_away()
         mn[2].increment_away()
-        self.assertTrue(mn.is_inactive)
+        self.assertFalse(mn.is_active)
         mn.add(4)
-        self.assertFalse(mn.is_inactive)
+        self.assertFalse(mn.is_active)
 
     def test_group_correlation(self) -> None:
         """Test group_correlation method."""
