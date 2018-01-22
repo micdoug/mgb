@@ -8,8 +8,8 @@ Modified: Jan 2018
 """
 
 from unittest import TestCase
-from entity import Entity
-from mobile_neighborhood import MobileNeighborhood
+from mgb.entity import Entity
+from mgb.mobile_neighborhood import MobileNeighborhood
 
 
 class MobileNeighborhoodTests(TestCase):

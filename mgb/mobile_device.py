@@ -8,7 +8,7 @@ Modified: Jan 2018
 """
 
 from typing import Set, List
-from mobile_neighborhood import MobileNeighborhood
+from mgb.mobile_neighborhood import MobileNeighborhood
 
 
 class MobileDevice(object):

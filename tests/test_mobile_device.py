@@ -8,9 +8,8 @@ Modified: Jan 2018
 """
 
 from unittest import TestCase
-from mobile_device import MobileDevice
-from entity import Entity
-from nose.tools import set_trace
+from mgb.mobile_device import MobileDevice
+from mgb.entity import Entity
 
 
 class MobileDeviceTests(TestCase):

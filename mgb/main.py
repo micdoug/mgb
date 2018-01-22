@@ -1,6 +1,6 @@
-from period import Period
-from entity import Entity
-from mobile_neighborhood import MobileNeighborhood
+from mgb.period import Period
+from mgb.entity import Entity
+from mgb.mobile_neighborhood import MobileNeighborhood
 
 if __name__ == '__main__':
     entities = MobileNeighborhood()

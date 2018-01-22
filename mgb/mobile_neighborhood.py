@@ -8,7 +8,7 @@ Modified: Jan 2018
 """
 
 from typing import Dict, TypeVar, Set, AbstractSet
-from entity import Entity
+from mgb.entity import Entity
 
 # Define the types supported for checking with 'in' instruction
 MEMBER = TypeVar('MEMBER', int, Entity)

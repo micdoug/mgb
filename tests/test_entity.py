@@ -8,7 +8,7 @@ Modified: Jan 2018
 """
 
 from unittest import TestCase
-from entity import Entity
+from mgb.entity import Entity
 
 
 class EntityTests(TestCase):
