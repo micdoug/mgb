@@ -24,10 +24,10 @@ class MobileDevice(object):
         :param uid: Identifier of the mobile device.
         """
         self._uid = uid
-        self._current_connections = set()
+        self._current_connections: Set[int] = set()
         self._strangers = MobileNeighborhood()
         self._friends = MobileNeighborhood()
-        self._archived = []
+        self._archived: List[Set[int]] = []
 
     def add_connection(self, uid: int) -> None:
         """Add a new connection in the list.

@@ -7,13 +7,8 @@ Created: Jan 2018
 Modified: Jan 2018
 """
 
-from typing import Dict, TypeVar, Set, AbstractSet
+from typing import Dict, Union, Set, AbstractSet
 from mgb.entity import Entity
-
-# Define the types supported for checking with 'in' instruction
-MEMBER = TypeVar('MEMBER', int, Entity)
-
-OPERATOR = TypeVar('OPERATOR', Set[int], 'MobileNeighborhood')
 
 
 class MobileNeighborhood(object):
@@ -32,7 +27,7 @@ class MobileNeighborhood(object):
         return self._entities
 
     @property
-    def is_active(self):
+    def is_active(self) -> bool:
         """Check if the mobile neighborhood is active.
 
         A group is considered active when at least 50% of the members are active.
@@ -76,14 +71,14 @@ class MobileNeighborhood(object):
         """Enable access by key."""
         return self.entities[uid]
 
-    def __contains__(self, item: MEMBER) -> bool:
+    def __contains__(self, item: Union[int, Entity]) -> bool:
         """Enable in operator."""
         return item in self.entities
 
     def __repr__(self) -> str:
         return "MobileNeighborhood(entities: {!r})".format(self.entities)
 
-    def __and__(self, other: OPERATOR) -> AbstractSet[int]:
+    def __and__(self, other: Union['MobileNeighborhood', Set[int]]) -> AbstractSet[int]:
         """Return the ids of intersection between two groups.
 
         :param other: Other group to be compared with or a set of ids.
@@ -93,7 +88,7 @@ class MobileNeighborhood(object):
         else:
             return self.entities.keys() & other.entities.keys()
 
-    def __or__(self, other: OPERATOR) -> AbstractSet[int]:
+    def __or__(self, other: Union['MobileNeighborhood', Set[int]]) -> AbstractSet[int]:
         """Return the ids of union members between two groups.
 
         :param other: Other group to be compared with.
@@ -103,17 +98,17 @@ class MobileNeighborhood(object):
         else:
             return self.entities.keys() | other.entities.keys()
 
-    def __sub__(self, other: OPERATOR) -> AbstractSet[int]:
+    def __sub__(self, other: Union['MobileNeighborhood', Set[int]]) -> AbstractSet[int]:
         if isinstance(other, set):
             return self._entities.keys() - other
         else:
-            return self._entities.keys - other._entities.keys()
+            return self._entities.keys() - other._entities.keys()
 
-    def __rsub__(self, other: OPERATOR) -> AbstractSet[int]:
+    def __rsub__(self, other: 'MobileNeighborhood') -> AbstractSet[int]:
         if isinstance(other, set):
-            return other - self._entities.keys()
+            return other - self.entities.keys()
         else:
-            return other._entities.keys() - self._entities.keys
+            return other._entities.keys() - self.entities.keys()
 
     def __len__(self) -> int:
         return len(self._entities)
