@@ -78,7 +78,3 @@ def main(trace_file: str,
     with open(output_file, "w", encoding="utf8") as out_file:
         json.dump(final_result, out_file)
     print(f"{period} periods loaded")
-
-
-if __name__ == '__main__':
-    main()
