@@ -32,7 +32,7 @@ class MobileDeviceTests(TestCase):
         # Add connection with 2 and 3, they should be included in strangers list
         device.add_connection(2)
         device.add_connection(3)
-        device.run_local_detection()
+        device.run_local_detection(1)
         self.assertEqual(len(device.friends), 0)
         self.assertEqual(len(device.strangers), 2)
         self.assertIn(2, device.strangers)
@@ -41,7 +41,7 @@ class MobileDeviceTests(TestCase):
         self.assertEqual(device.strangers[3].close_counter, 1)
 
         # Scan again
-        device.run_local_detection()
+        device.run_local_detection(2)
         self.assertEqual(len(device.friends), 0)
         self.assertEqual(len(device.strangers), 2)
         self.assertIn(2, device.strangers)
@@ -51,7 +51,7 @@ class MobileDeviceTests(TestCase):
 
         # Remove connection with 3 and scan again
         device.remove_connection(3)
-        device.run_local_detection()
+        device.run_local_detection(3)
         self.assertEqual(len(device.friends), 1)
         self.assertEqual(len(device.strangers), 1)
         self.assertIn(2, device.friends)
@@ -63,7 +63,7 @@ class MobileDeviceTests(TestCase):
 
         # Add connection with 4
         device.add_connection(4)
-        device.run_local_detection()
+        device.run_local_detection(4)
         self.assertEqual(len(device.friends), 1)
         self.assertEqual(len(device.strangers), 1)
         self.assertIn(2, device.friends)
@@ -75,8 +75,8 @@ class MobileDeviceTests(TestCase):
         self.assertEqual(device.strangers[4].away_counter, 0)
 
         # Run scan twice to add 4 in the friends list
-        device.run_local_detection()
-        device.run_local_detection()
+        device.run_local_detection(5)
+        device.run_local_detection(6)
         self.assertEqual(len(device.friends), 2)
         self.assertEqual(len(device.strangers), 0)
         self.assertIn(2, device.friends)
@@ -90,7 +90,7 @@ class MobileDeviceTests(TestCase):
         device.remove_connection(2)
         device.remove_connection(4)
         device.add_connection(3)
-        device.run_local_detection()
+        device.run_local_detection(7)
         self.assertEqual(len(device.friends), 2)
         self.assertEqual(len(device.strangers), 1)
         self.assertIn(2, device.friends)
@@ -104,7 +104,7 @@ class MobileDeviceTests(TestCase):
         self.assertEqual(device.strangers[3].away_counter, 0)
 
         # Run scan again, should archive friends
-        device.run_local_detection()
+        device.run_local_detection(8)
         self.assertEqual(len(device.friends), 0)
         self.assertEqual(len(device.strangers), 0)
         self.assertEqual(len(device.archived), 1)

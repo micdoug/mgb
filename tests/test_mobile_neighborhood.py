@@ -30,13 +30,13 @@ class MobileNeighborhoodTests(TestCase):
         # Test add
         self.assertFalse(1 in mn)
         self.assertFalse(Entity(1) in mn)
-        mn.add(1)
+        mn.add(1, 1)
         self.assertTrue(1 in mn)
         self.assertTrue(Entity(1) in mn)
 
         # Add the same entity should not modify internal object
         old = mn[1]
-        mn.add(1)
+        mn.add(1, 2)
         self.assertIs(old, mn[1])
 
         # Test remove
@@ -48,8 +48,8 @@ class MobileNeighborhoodTests(TestCase):
         self.assertFalse(Entity(1) in mn)
         
         # Test lenght
-        mn.add(1)
-        mn.add(2)
+        mn.add(1, 2)
+        mn.add(2, 2)
         self.assertEqual(len(mn), 2)
         self.assertTrue(1 in mn and 2 in mn)
 
@@ -58,18 +58,18 @@ class MobileNeighborhoodTests(TestCase):
         mn1 = MobileNeighborhood()
         mn2 = MobileNeighborhood()
 
-        mn1.add(1)
-        mn1.add(2)
-        mn1.add(3)
+        mn1.add(1, 1)
+        mn1.add(2, 1)
+        mn1.add(3, 1)
 
-        mn2.add(1)
-        mn2.add(4)
-        mn2.add(5)
+        mn2.add(1, 1)
+        mn2.add(4, 1)
+        mn2.add(5, 1)
 
         intersec = mn1 & mn2
         self.assertSetEqual(intersec, {1})
 
-        mn2.add(2)
+        mn2.add(2, 1)
         intersec = mn1 & mn2
         self.assertSetEqual(intersec, {1, 2})
 
@@ -83,18 +83,18 @@ class MobileNeighborhoodTests(TestCase):
         mn1 = MobileNeighborhood()
         mn2 = MobileNeighborhood()
 
-        mn1.add(1)
-        mn1.add(2)
-        mn1.add(3)
+        mn1.add(1, 1)
+        mn1.add(2, 1)
+        mn1.add(3, 1)
 
-        mn2.add(1)
-        mn2.add(4)
-        mn2.add(5)
+        mn2.add(1, 1)
+        mn2.add(4, 1)
+        mn2.add(5, 1)
 
         intersec = mn1 | mn2
         self.assertSetEqual(intersec, {1, 2, 3, 4, 5})
 
-        mn2.add(2)
+        mn2.add(2, 1)
         intersec = mn1 | mn2
         self.assertSetEqual(intersec, {1, 2, 3, 4, 5})
 
@@ -110,9 +110,11 @@ class MobileNeighborhoodTests(TestCase):
         Entity.INACTIVE_THRESHOLD = 2
         mn = MobileNeighborhood()
         self.assertTrue(mn.is_active)
-        mn.add(1)
-        mn.add(2)
-        mn.add(3)
+        mn.add(1, 1)
+        mn.add(2, 2)
+        mn.add(3, 3)
+        self.assertEqual(mn.started, 1)
+        self.assertEqual(mn.ended, 3)
         self.assertTrue(mn.is_active)
         mn[1].increment_away()
         mn[1].increment_away()
@@ -125,7 +127,7 @@ class MobileNeighborhoodTests(TestCase):
         mn[2].increment_away()
         mn[2].increment_away()
         self.assertFalse(mn.is_active)
-        mn.add(4)
+        mn.add(4, 4)
         self.assertFalse(mn.is_active)
 
     def test_group_correlation(self) -> None:
@@ -134,14 +136,18 @@ class MobileNeighborhoodTests(TestCase):
         mn2 = MobileNeighborhood()
 
         self.assertEqual(mn1.group_correlation(mn2), 0)
-        mn1.add(1)
+        mn1.add(1, 1)
         self.assertEqual(mn1.group_correlation(mn2), 0)
-        mn2.add(1)
+        mn2.add(1, 2)
         self.assertEqual(mn1.group_correlation(mn2), 1)
-        mn2.add(2)
+        mn2.add(2, 2)
         self.assertEqual(mn1.group_correlation(mn2), 0.5)
-        mn2.add(3)
-        mn2.add(4)
-        mn2.add(5)
-        mn1.add(2)
+        mn2.add(3, 3)
+        mn2.add(4, 3)
+        mn2.add(5, 3)
+        mn1.add(2, 3)
         self.assertEqual(mn1.group_correlation(mn2), 0.4)
+        self.assertEqual(mn1.started, 1)
+        self.assertEqual(mn1.ended, 3)
+        self.assertEqual(mn2.started, 2)
+        self.assertEqual(mn2.ended, 3)

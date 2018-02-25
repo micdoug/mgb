@@ -27,7 +27,7 @@ class MobileDevice(object):
         self._current_connections: Set[int] = set()
         self._strangers = MobileNeighborhood()
         self._friends = MobileNeighborhood()
-        self._archived: List[Set[int]] = []
+        self._archived: List[MobileNeighborhood] = []
 
     def add_connection(self, uid: int) -> None:
         """Add a new connection in the list.
@@ -43,21 +43,13 @@ class MobileDevice(object):
         """
         self._current_connections.remove(uid)
 
-    def _reset_strangers(self) -> None:
-        """Reset current strangers."""
-        self._strangers = MobileNeighborhood()
-
-    def _reset_friends(self) -> None:
-        """Reset current friends."""
-        self._friends = MobileNeighborhood()
-
     @property
     def uid(self) -> int:
         """Return the mobile unique identifier."""
         return self._uid
 
     @property
-    def archived(self) -> List[Set[int]]:
+    def archived(self) -> List[MobileNeighborhood]:
         """Access archived friends lists (groups)."""
         return self._archived
 
@@ -69,17 +61,17 @@ class MobileDevice(object):
     def strangers(self) -> MobileNeighborhood:
         return self._strangers
 
-    def run_local_detection(self) -> None:
+    def run_local_detection(self, time: float) -> None:
         """Run the local detection algorithm based on current state."""
         self._update_friends_connection()
-        self._update_strangers_connection()
+        self._update_strangers_connection(time)
 
         # Check if we need to archive current friend list as a group
         if not self._friends.is_active:
-            uids = set(self.friends._entities.keys())
-            uids.add(self.uid)
-            if len(uids) > 2:
-                self._archived.append(uids)
+            # When add itself as a member the ended time is adjusted to current time
+            self._friends.add(self.uid, time)
+            if len(self._friends) > 2:
+                self._archived.append(self._friends)
             self._friends = MobileNeighborhood()
             self._strangers = MobileNeighborhood()
 
@@ -97,13 +89,15 @@ class MobileDevice(object):
         for uid in (self._friends - self._current_connections):
             self._friends[uid].increment_away()
 
-    def _update_strangers_connection(self) -> None:
+    def _update_strangers_connection(self, time: float) -> None:
         """Update strangers information based on current connections.
 
         An entity in the strangers list has its close_counter incremented if there are a
         connection with it. If there are no connection with it, the away counter is incremented.
         New nodes are added in the strangers list. Nodes with a number of connections greater
         than the threshold, are transferred to friends list.
+
+        :param time: The current simulation time.
         """
         # Strangers without current connection
         for uid in (self._strangers - self._current_connections):
@@ -118,9 +112,9 @@ class MobileDevice(object):
             # If the entity is a friend, remove it from strangers list and add it to friends
             if self._strangers[uid].is_friend:
                 self._strangers.remove(uid)
-                self._friends.add(uid)
+                self._friends.add(uid, time)
 
         # New strangers
         for uid in (self._current_connections - (self._strangers | self._friends)):
-            self._strangers.add(uid)
+            self._strangers.add(uid, time)
             self._strangers[uid].increment_close()

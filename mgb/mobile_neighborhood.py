@@ -20,6 +20,27 @@ class MobileNeighborhood(object):
     def __init__(self) -> None:
         """Initialize internal dictionary."""
         self._entities: Dict[int, Entity] = {}
+        self._started: float = 0
+        self._ended: float = 0
+
+    @property
+    def started(self) -> float:
+        """Define the time the group was initialized."""
+        return self._started
+
+    @property
+    def ended(self) -> float:
+        """Define the time the group was archived."""
+        return self._ended
+
+    @ended.setter
+    def ended(self, value: float) -> None:
+        """Set the time the group was archived.
+
+        :param value: The value to set.
+        """
+        assert value >= self.started
+        self._ended = value
 
     @property
     def entities(self) -> Dict[int, Entity]:
@@ -38,13 +59,17 @@ class MobileNeighborhood(object):
         else:
             return True
 
-    def add(self, uid: int) -> None:
+    def add(self, uid: int, time: float) -> None:
         """Add a new entity in the neighborhood list.
 
         :param uid: Entity identifier.
+        :param time: Current simulation time.
         """
+        if not self.entities:
+            self._started = time
         if uid not in self.entities:
             self.entities[uid] = Entity(uid)
+            self._ended = time
 
     def remove(self, uid: int) -> None:
         """Remove an entity from the neighborhood list.
