@@ -14,8 +14,8 @@ from mgb import ConnectionGenerator
 from mgb import MobileDevice
 from mgb import Entity
 from typing import List
-from pdb import set_trace
 import json
+import logging
 
 
 @click.command(name="MGB")
@@ -38,21 +38,32 @@ import json
               help="Number of seconds to wait before running the next step of the detection"
               "algorithm", required=True)
 @click.option('--output-file', help="File used to store detected groups.", required=True)
+@click.option('--verbose/--no-verbose', default=False)
 def main(trace_file: str,
          friend_threshold: int,
          inactive_threshold: int,
          number_of_nodes: int,
          scan_interval: float,
-         output_file: str) -> None:
+         output_file: str,
+         verbose: bool) -> None:
+
+    if verbose:
+        logging.basicConfig(level="DEBUG")
+    else:
+        logging.basicConfig(level="INFO")
 
     devices: List[MobileDevice] = [MobileDevice(uid) for uid in range(number_of_nodes)]
     Entity.FRIEND_THRESHOLD = friend_threshold
     Entity.INACTIVE_THRESHOLD = inactive_threshold
 
     period = 1
+    logging.info("Starting detection algorithm")
+    logging.info(f"Setting friend threshold to {Entity.FRIEND_THRESHOLD}")
+    logging.info(f"Setting inactive threshold to {Entity.INACTIVE_THRESHOLD}")
+    logging.info(f"Starting processing contacts with interval of {scan_interval} seconds")
     with ConnectionGenerator(trace_file, scan_interval) as con_gen:
         while not con_gen.has_finished:
-            print(f"Loading connections from period {period}")
+            logging.debug(f"Loading connections from period {period}")
             for connection in con_gen:
                 if connection.con_type == ConnectionType.UP:
                     devices[connection.node1].add_connection(connection.node2)
@@ -62,7 +73,7 @@ def main(trace_file: str,
                     devices[connection.node2].remove_connection(connection.node1)
                 else:
                     raise RuntimeError("Invalid connection type {connection}")
-            print(f"Running local detection algorithm for period {period}")
+            logging.debug(f"Running local detection algorithm for period {period}")
             for device in devices:
                 device.run_local_detection(period*scan_interval)
             period += 1
@@ -74,7 +85,7 @@ def main(trace_file: str,
             "members": list(mn.entities.keys())
             } for mn in dev.archived] for dev in devices
     }
-    print("Writing output file")
+    logging.info("Writing output file")
     with open(output_file, "w", encoding="utf8") as out_file:
         json.dump(final_result, out_file)
-    print(f"{period} periods loaded")
+    logging.info(f"Processed {period} periods of {scan_interval} seconds")
