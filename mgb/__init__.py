@@ -1,3 +1,4 @@
+from mgb.configuration import Configuration
 from mgb.entity import Entity
 from mgb.mobile_device import MobileDevice
 from mgb.mobile_neighborhood import MobileNeighborhood
