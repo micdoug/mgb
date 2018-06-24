@@ -9,7 +9,7 @@ Modified: Feb 2018
 """
 
 from typing import Generator, Optional
-from mgb import Connection
+from mgb.local_detection import Connection
 
 
 class ConnectionGenerator(object):

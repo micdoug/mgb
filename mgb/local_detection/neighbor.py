@@ -1,25 +1,27 @@
 """
-Define the entity class.
+Define the neighbor class.
 
 Authors:
     Michael D. Silva <micdoug.silva@gmail.com>
 Created: Jan 2018
-Modified: Jan 2018
+Modified: Jun 2018
 """
 
 
-class Entity(object):
-    """Encapsulate an entity that is tracked by a node."""
+class Neighbor(object):
+    """Encapsulate a neighbor tracked by a mobile device."""
 
     # Class attributes
     INACTIVE_THRESHOLD = 5
     FRIEND_THRESHOLD = 10
 
-    def __init__(self, uid: int) -> None:
+    def __init__(self, uid: int, inactive_threshold: int, friend_threshold: int) -> None:
         """Constructor."""
         self._id = uid
         self._close_counter = 0
         self._away_counter = 0
+        self._inactive_threshold = inactive_threshold
+        self._friend_threshold = friend_threshold
 
     def increment_close(self) -> None:
         """Increment the close value and reset away value."""
@@ -49,12 +51,12 @@ class Entity(object):
     @property
     def is_friend(self) -> bool:
         """Define if the entity can be considered a friend based on close value."""
-        return self.close_counter >= Entity.FRIEND_THRESHOLD
+        return self.close_counter >= self._friend_threshold
 
     @property
     def is_active(self) -> bool:
         """Define if the entity is currently active, based on away value."""
-        return self.away_counter < Entity.INACTIVE_THRESHOLD
+        return self.away_counter < self._inactive_threshold
 
     def __repr__(self) -> str:
         return "Entity(id: {}, close: {}, away: {})".format(

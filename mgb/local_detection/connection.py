@@ -1,10 +1,10 @@
 """
-Define the contact class.
+Define the Connection class.
 
 Authors:
     Michael D. Silva <micdoug.silva@gmail.com>
 Created: Jan 2018
-Modified: Jan 2018
+Modified: Jun 2018
 """
 
 import enum

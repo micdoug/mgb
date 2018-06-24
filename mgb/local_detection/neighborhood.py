@@ -1,27 +1,29 @@
 """
-Define the MobileNeighborhood class.
+Define the Neighborhood class.
 
 Authors:
     Michael D. Silva <micdoug.silva@gmail.com>
 Created: Jan 2018
-Modified: Jan 2018
+Modified: Jun 2018
 """
 
 from typing import Dict, Union, Set, AbstractSet
-from mgb.entity import Entity
+from mgb.local_detection import Neighbor
 
 
-class MobileNeighborhood(object):
+class Neighborhood(object):
     """Define a neighborhood set.
 
-    It stores references to entities in the neighborhood.
+    It stores references to devices in the neighborhood.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, inactive_threshold: int, friend_threshold: int) -> None:
         """Initialize internal dictionary."""
-        self._entities: Dict[int, Entity] = {}
+        self._entities: Dict[int, Neighbor] = {}
         self._started: float = 0
         self._ended: float = 0
+        self._inactive_threshold = inactive_threshold
+        self._friend_threshold = friend_threshold
 
     @property
     def started(self) -> float:
@@ -43,7 +45,7 @@ class MobileNeighborhood(object):
         self._ended = value
 
     @property
-    def entities(self) -> Dict[int, Entity]:
+    def entities(self) -> Dict[int, Neighbor]:
         """Access the internal entities representation."""
         return self._entities
 
@@ -68,7 +70,7 @@ class MobileNeighborhood(object):
         if not self.entities:
             self._started = time
         if uid not in self.entities:
-            self.entities[uid] = Entity(uid)
+            self.entities[uid] = Neighbor(uid, self._inactive_threshold, self._friend_threshold)
             self._ended = time
 
     def remove(self, uid: int) -> None:
@@ -92,11 +94,11 @@ class MobileNeighborhood(object):
         else:
             return len(self & other) / len(self | other)
 
-    def __getitem__(self, uid: int) -> Entity:
+    def __getitem__(self, uid: int) -> Neighbor:
         """Enable access by key."""
         return self.entities[uid]
 
-    def __contains__(self, item: Union[int, Entity]) -> bool:
+    def __contains__(self, item: Union[int, Neighbor]) -> bool:
         """Enable in operator."""
         return item in self.entities
 

@@ -1,5 +1,5 @@
 """
-Define the MobileDevice class.
+Define the Device class.
 
 Authors:
     Michael D. Silva <micdoug.silva@gmail.com>
@@ -8,26 +8,29 @@ Modified: Jan 2018
 """
 
 from typing import Set, List
-from mgb.mobile_neighborhood import MobileNeighborhood
+from mgb.local_detection import Neighborhood
+from mgb.shared import Configuration
 
 
-class MobileDevice(object):
+class Device(object):
     """Define a mobile device.
 
-    A mobile device keep track of its neighboohood and execute the local detection part
+    A mobile device keep track of its neighborhood and executes the local detection part
     of the algorithm.
     """
 
-    def __init__(self, uid: int) -> None:
+    def __init__(self, uid: int, config: Configuration) -> None:
         """Initialize mobile device data.
 
         :param uid: Identifier of the mobile device.
         """
         self._uid = uid
         self._current_connections: Set[int] = set()
-        self._strangers = MobileNeighborhood()
-        self._friends = MobileNeighborhood()
-        self._archived: List[MobileNeighborhood] = []
+        self._friend_threshold = config.friend_threshold
+        self._inactive_threshold = config.inactive_threshold
+        self._strangers = Neighborhood(self._inactive_threshold, self._friend_threshold)
+        self._friends = Neighborhood(self._inactive_threshold, self._friend_threshold)
+        self._archived: List[Neighborhood] = []
 
     def add_connection(self, uid: int) -> None:
         """Add a new connection in the list.
@@ -49,16 +52,18 @@ class MobileDevice(object):
         return self._uid
 
     @property
-    def archived(self) -> List[MobileNeighborhood]:
+    def archived(self) -> List[Neighborhood]:
         """Access archived friends lists (groups)."""
         return self._archived
 
     @property
-    def friends(self) -> MobileNeighborhood:
+    def friends(self) -> Neighborhood:
+        """Return the current list of friends."""
         return self._friends
 
     @property
-    def strangers(self) -> MobileNeighborhood:
+    def strangers(self) -> Neighborhood:
+        """Return the current list of strangers."""
         return self._strangers
 
     def run_local_detection(self, time: float) -> None:
@@ -72,8 +77,8 @@ class MobileDevice(object):
             self._friends.add(self.uid, time)
             if len(self._friends) > 2:
                 self._archived.append(self._friends)
-            self._friends = MobileNeighborhood()
-            self._strangers = MobileNeighborhood()
+            self._friends = Neighborhood(self._inactive_threshold, self._friend_threshold)
+            self._strangers = Neighborhood(self._inactive_threshold, self._friend_threshold)
 
     def _update_friends_connection(self) -> None:
         """Update friends information based on current connections.
