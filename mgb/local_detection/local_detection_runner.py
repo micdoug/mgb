@@ -6,6 +6,7 @@ Authors:
 Created: Jun 2018
 Modified: Jun 2018
 """
+
 from mgb.local_detection import Neighborhood, ConnectionGenerator, ConnectionType
 from mgb.shared import Configuration
 from typing import Dict, List
@@ -61,38 +62,38 @@ class LocalDetectionRunner(object):
                         raise RuntimeError(f"Invalid connection type {connection}.")
                 self._logger.debug(f"Running local detection algorithm for period {period}")
                 for device in devices:
-                    device.run_local_detection(period*scan_interval)
+                    device.run_local_detection(period * scan_interval)
                 period += 1
 
         self._logger.debug(f"Processed {period} periods of {scan_interval} seconds.")
         self._logger.info("Formatting output data.")
         result = {device.uid: device.archived for device in devices}
 
+        enable_filter = self._config.step1_enable_filtering
+        self._logger.debug(f"Using filter: {enable_filter}")
+        size_threshold = self._config.step1_size_threshold
+        self._logger.debug(f"Using size threshold of {size_threshold}")
+        if enable_filter:
+            for uid, neighborhood_list in result.items():
+                result[uid] = [
+                    neighborhood for neighborhood in neighborhood_list
+                    if len(neighborhood.entities) >= size_threshold
+                ]
+
         if not self._config.step1_enable_output:
             return result
 
         prefix = self._config.step1_output_prefix
         self._logger.debug(f"Using output prefix {prefix}")
-        enable_filter = self._config.step1_enable_filtering
-        self._logger.debug(f"Using filter: {enable_filter}")
-        size_threshold = self._config.step1_size_threshold
-        self._logger.debug(f"Using size threshold of {size_threshold}")
 
         self._logger.info(f"Writing output")
         for device in devices:
             filename = path.join(self._config.output_dir, f"{prefix}node{device.uid}.json")
-            if enable_filter:
-                output_data = [{
-                    "started": mn.started,
-                    "ended": mn.ended,
-                    "members": list(mn.entities)
-                } for mn in device.archived if len(mn.entities) >= size_threshold]
-            else:
-                output_data = [{
-                    "started": mn.started,
-                    "ended": mn.ended,
-                    "members": list(mn.entities)
-                } for mn in device.archived]
+            output_data = [{
+                "started": mn.started,
+                "ended": mn.ended,
+                "members": list(mn.entities)
+            } for mn in device.archived]
             self._logger.debug(f"Writing output {filename}")
             with open(filename, 'w', encoding='utf-8') as output:
                 json.dump(output_data, output)

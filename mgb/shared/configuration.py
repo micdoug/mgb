@@ -42,5 +42,5 @@ class Configuration(object):
         self.step2_enabled = parser.getboolean('step2', 'enabled')
         self.step2_enable_output = parser.getboolean('step2', 'enable_output')
         self.step2_output_prefix = parser.get('step2', 'output_prefix')
-        self.step2_enable_filtering = parser.get('step2', 'enable_filtering')
+        self.step2_enable_filtering = parser.getboolean('step2', 'enable_filtering')
         self.step2_encounters_threshold = parser.getint('step2', 'encounters_threshold')

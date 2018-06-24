@@ -9,6 +9,7 @@ Modified: Feb 2018
 
 import click
 from mgb.local_detection import LocalDetectionRunner
+from mgb.group_merging import GroupMergingRunner
 from mgb.shared import Configuration
 import logging
 import os.path as path
@@ -44,7 +45,14 @@ def main(configuration_file: str,
 
     try:
         local_detection_runner = LocalDetectionRunner(config)
-        local_detection_runner.run()
+        result = local_detection_runner.run()
     except Exception as e:
         logging.exception(e)
         exit(1)
+
+    try:
+        group_merging_runner = GroupMergingRunner(config)
+        result = group_merging_runner.run(result)
+    except Exception as e:
+        logging.exception(e)
+        exit(2)

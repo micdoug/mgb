@@ -7,3 +7,4 @@ Created: May 2018
 Modified: Jun 2018
 """
 from mgb.shared.configuration import Configuration
+from mgb.shared.period import Period

@@ -8,7 +8,7 @@ Modified: Jan 2018
 """
 
 from unittest import TestCase
-from mgb.period import Period
+from mgb.shared.period import Period
 
 
 class PeriodTests(TestCase):
