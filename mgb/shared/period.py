@@ -53,5 +53,17 @@ class Period(object):
         """
         return not (other.end <= self.begin or other.begin >= self.end)
 
+    def try_merge(self, other: 'Period') -> bool:
+        """
+        Merge two periods if they have intersection.
+        :param other: Other period.
+        :return: If the periods were merged.
+        """
+        if self.has_intersection(other):
+            self._begin = min(self._begin, other.begin)
+            self._end = max(self._end, other.end)
+            return True
+        return False
+
     def __repr__(self) -> str:
         return "Period(begin: {}, end: {})".format(self.begin, self.end)

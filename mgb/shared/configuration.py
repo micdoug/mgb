@@ -39,8 +39,16 @@ class Configuration(object):
         self.step1_size_threshold = parser.getint('step1', 'size_threshold')
 
         # step 2 section
-        self.step2_enabled = parser.getboolean('step2', 'enabled')
         self.step2_enable_output = parser.getboolean('step2', 'enable_output')
         self.step2_output_prefix = parser.get('step2', 'output_prefix')
         self.step2_enable_filtering = parser.getboolean('step2', 'enable_filtering')
         self.step2_encounters_threshold = parser.getint('step2', 'encounters_threshold')
+
+        # step 3 section
+        self.step3_enable_output = parser.getboolean('step3', 'enable_output')
+        self.step3_output_prefix = parser.get('step3', 'output_prefix')
+        self.step3_enable_filtering = parser.getboolean('step3', 'enable_filtering')
+        self.step3_size_threshold = parser.getint('step3', 'size_threshold')
+        self.step3_encounters_threshold = parser.getint('step3', 'encounters_threshold')
+
+        

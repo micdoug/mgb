@@ -10,6 +10,7 @@ Modified: Feb 2018
 import click
 from mgb.local_detection import LocalDetectionRunner
 from mgb.group_merging import GroupMergingRunner
+from mgb.neighborhood_inspection import NeighborhoodInspectionRunner
 from mgb.shared import Configuration
 import logging
 import os.path as path
@@ -48,11 +49,18 @@ def main(configuration_file: str,
         result = local_detection_runner.run()
     except Exception as e:
         logging.exception(e)
-        exit(1)
+        exit(2)
 
     try:
         group_merging_runner = GroupMergingRunner(config)
         result = group_merging_runner.run(result)
+    except Exception as e:
+        logging.exception(e)
+        exit(2)
+
+    try:
+        neighborhood_instrospection_runner = NeighborhoodInspectionRunner(config)
+        result = neighborhood_instrospection_runner.run(result)
     except Exception as e:
         logging.exception(e)
         exit(2)
