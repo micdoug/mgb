@@ -8,6 +8,8 @@ Modified: Feb 2018
 """
 
 import click
+
+from mgb.graph_creation import GraphCreationRunner
 from mgb.local_detection import LocalDetectionRunner
 from mgb.group_merging import GroupMergingRunner
 from mgb.neighborhood_inspection import NeighborhoodInspectionRunner
@@ -48,6 +50,7 @@ def main(configuration_file: str,
         local_detection_runner = LocalDetectionRunner(config)
         result = local_detection_runner.run()
     except Exception as e:
+        logging.error('Error when running the local detection step.')
         logging.exception(e)
         exit(2)
 
@@ -55,6 +58,7 @@ def main(configuration_file: str,
         group_merging_runner = GroupMergingRunner(config)
         result = group_merging_runner.run(result)
     except Exception as e:
+        logging.error('Error when running the group merging step.')
         logging.exception(e)
         exit(2)
 
@@ -62,5 +66,14 @@ def main(configuration_file: str,
         neighborhood_instrospection_runner = NeighborhoodInspectionRunner(config)
         result = neighborhood_instrospection_runner.run(result)
     except Exception as e:
+        logging.error('Error when running neighborhood introspection step.')
+        logging.exception(e)
+        exit(2)
+
+    try:
+        graph_creation_runner = GraphCreationRunner(config)
+        graph_creation_runner.run(result)
+    except Exception as e:
+        logging.error('Error when generationg group graph.')
         logging.exception(e)
         exit(2)

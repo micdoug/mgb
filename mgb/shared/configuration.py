@@ -51,4 +51,7 @@ class Configuration(object):
         self.step3_size_threshold = parser.getint('step3', 'size_threshold')
         self.step3_encounters_threshold = parser.getint('step3', 'encounters_threshold')
 
-        
+        # step 4 section
+        self.step4_output_prefix = parser.get('step4', 'output_prefix')
+        self.step4_simulation_time = parser.getint('step4', 'simulation_time')
+        self.step4_message_ttl = parser.getint('step4', 'message_ttl')

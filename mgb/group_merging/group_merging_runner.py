@@ -69,8 +69,6 @@ class GroupMergingRunner(object):
 
         self._logger.info("Writing output")
         for uid, merged_groups in merged_by_device.items():
-            if merged_groups:
-                import pdb; pdb.set_trace()
             filename = path.join(
                 self.config.output_dir,
                 f"{self.config.step2_output_prefix}node{uid}.json"

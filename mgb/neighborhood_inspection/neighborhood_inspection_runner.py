@@ -23,7 +23,7 @@ class NeighborhoodInspectionRunner(object):
         self.config = config
         self._logger = logging.getLogger('NeighborhoodInspection')
 
-    def run(self, input: Dict[int, List[MergedGroup]]) -> Dict[int, List[MergedGroup]]:
+    def run(self, input: Dict[int, List[MergedGroup]]) -> Dict[int, List[MultiMergedGroup]]:
         self._logger.info('Starting neighborhood inspection step')
 
         # Since we are merging information across mutable objects we need to create a shadow copy
@@ -42,6 +42,7 @@ class NeighborhoodInspectionRunner(object):
             # Fetch all direct neighbors of the current device
             for merged_group in merged_groups:
                 neighbors.update(merged_group.members)
+            neighbors.remove(uid)
 
             # for each neighbor we need to try to merge its merged groups into the current device
             for neighbor in neighbors:
