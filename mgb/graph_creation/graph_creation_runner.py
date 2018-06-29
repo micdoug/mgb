@@ -47,37 +47,37 @@ class GraphCreationRunner(object):
             for group_id, group in groups_identified.items():
                 weight = 1 - exp(-(message_ttl * (len(group.periods)/simulation_time)))
                 groups_weight[group_id] = weight
-                logging.debug(f"Group weight {weight}")
+                self._logger.debug(f"Group weight {weight}")
 
             # Build the graph
-            logging.debug(f"Building the graph")
+            self._logger.debug(f"Building the graph")
             graph = nx.Graph()
             for group_a_id, group_b_id in permutations(groups_identified, 2):
                 group_a = groups_identified[group_a_id]
                 group_b = groups_identified[group_b_id]
                 group_similarity = len(group_a.members & group_b.members) / len(group_a.members | group_b.members)
                 edge_weight = groups_weight[group_a_id] * groups_weight[group_b_id] * group_similarity
-                logging.debug(f"Calculating edge ({group_a_id}, {group_b_id}) with weight {edge_weight}")
+                self._logger.debug(f"Calculating edge ({group_a_id}, {group_b_id}) with weight {edge_weight}")
                 if edge_weight == 0:
                     edge_weight = float('inf')
                 else:
                     edge_weight = -log(edge_weight)
                 graph.add_edge(group_a_id, group_b_id, weight=edge_weight)
-                logging.debug(f"Added edge ({group_a_id}, {group_b_id}) with weight {edge_weight}")
+                self._logger.debug(f"Added edge ({group_a_id}, {group_b_id}) with weight {edge_weight}")
 
             prefix = self.config
             graph_filename = path.join(
                 self.config.output_dir,
                 f"{self.config.step4_output_prefix}node{uid}.pickle"
             )
-            logging.debug(f"Writing file {graph_filename}")
+            self._logger.debug(f"Writing file {graph_filename}")
             with open(graph_filename, 'wb') as pickle_output:
                 pickle.dump(graph, pickle_output)
             groups_filename = path.join(
                 self.config.output_dir,
                 f"{self.config.step4_output_prefix}node{uid}.json"
             )
-            logging.debug(f"Writing file {groups_filename}")
+            self._logger.debug(f"Writing file {groups_filename}")
             with open(groups_filename, 'w', encoding='utf-8') as groups_output:
                 output_data = [{
                     "id": identifier,
