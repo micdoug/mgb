@@ -62,13 +62,14 @@ def main(configuration_file: str,
         logging.exception(e)
         exit(2)
 
-    try:
-        neighborhood_instrospection_runner = NeighborhoodInspectionRunner(config)
-        result = neighborhood_instrospection_runner.run(result)
-    except Exception as e:
-        logging.error('Error when running neighborhood introspection step.')
-        logging.exception(e)
-        exit(2)
+    for _ in range(2):
+        try:
+            neighborhood_instrospection_runner = NeighborhoodInspectionRunner(config)
+            result = neighborhood_instrospection_runner.run(result)
+        except Exception as e:
+            logging.error('Error when running neighborhood introspection step.')
+            logging.exception(e)
+            exit(2)
 
     try:
         graph_creation_runner = GraphCreationRunner(config)
